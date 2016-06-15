@@ -92,6 +92,7 @@ class LanguagePack::Ruby < LanguagePack::Base
       allow_git do
         install_bundler_in_app
         build_bundler
+        build_bundler 'Gemfile.rails4'
         post_bundler
         create_database_yml
         install_binaries
@@ -477,12 +478,12 @@ WARNING
   end
 
   # runs bundler to install the dependencies
-  def build_bundler
+  def build_bundler(gemfile = 'Gemfile')
     instrument 'ruby.build_bundler' do
       log("bundle") do
         bundle_without = env("BUNDLE_WITHOUT") || "development:test"
         bundle_bin     = "bundle"
-        bundle_command = "#{bundle_bin} install --without #{bundle_without} --path vendor/bundle --binstubs #{bundler_binstubs_path}"
+        bundle_command = "#{bundle_bin} install --gemfile #{gemfile} --without #{bundle_without} --path vendor/bundle --binstubs #{bundler_binstubs_path}"
         bundle_command << " -j4"
 
         if bundler.windows_gemfile_lock?
@@ -539,15 +540,16 @@ WARNING
         if $?.success?
           puts "Bundle completed (#{"%.2f" % bundle_time}s)"
           log "bundle", :status => "success"
-          puts "Cleaning up the bundler cache."
-          instrument "ruby.bundle_clean" do
-            # Only show bundle clean output when not using default cache
-            if load_default_cache?
-              run "bundle clean > /dev/null"
-            else
-              pipe("#{bundle_bin} clean", out: "2> /dev/null")
-            end
-          end
+          puts "Not cleaning up the bundler cache because we got 2 Gemfiles."
+          #puts "Cleaning up the bundler cache."
+          #instrument "ruby.bundle_clean" do
+          #  # Only show bundle clean output when not using default cache
+          #  if load_default_cache?
+          #    run "bundle clean > /dev/null"
+          #  else
+          #    pipe("#{bundle_bin} clean", out: "2> /dev/null")
+          #  end
+          #end
           cache.store ".bundle"
           @bundler_cache.store
 
