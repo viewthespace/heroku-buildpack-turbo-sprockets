@@ -91,7 +91,7 @@ class LanguagePack::Ruby < LanguagePack::Base
       setup_profiled
       allow_git do
         install_bundler_in_app
-        build_bundler 'Gemfile.rails4'
+        build_bundler 'Gemfile.rails3'
         build_bundler
         post_bundler
         create_database_yml
