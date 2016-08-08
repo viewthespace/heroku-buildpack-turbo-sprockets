@@ -30,7 +30,7 @@ class LanguagePack::Rails4 < LanguagePack::Rails3
     end
   end
 
-  def build_bundler
+  def build_bundler(gemfile = 'Gemfile')
     instrument "rails4.build_bundler" do
       super
     end
